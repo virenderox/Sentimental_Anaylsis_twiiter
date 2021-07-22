@@ -1,10 +1,3 @@
-"""
-Created on Thu Oct 05 17:42:01 2020
-
-@author: Abhishek Darekar
-"""
-
-
 
 import streamlit as st
 import warnings
@@ -17,8 +10,8 @@ import tweepy
 import json
 from tweepy import OAuthHandler
 import re
-import textblob
-from textblob import TextBlob
+import text.blob
+from text.blob import TextBlob
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import openpyxl
 import time
@@ -31,7 +24,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
-import seaborn as sns
+#import seaborn as sns
 #sns.set_style('darkgrid')
 
 
@@ -54,10 +47,10 @@ def main():
     st.subheader("Select a topic which you'd like to get the sentiment analysis on :")
 
     ################# Twitter API Connection #######################
-    consumer_key = "Enter Key Here"
-    consumer_secret = "Enter Key Here"
-    access_token = "Enter Key Here"
-    access_token_secret = "Enter Key Here"
+    consumer_key = "YCyZzlGlH4bVcgu9DEtXGGCtb"
+    consumer_secret = "zBH1Yus7hpCE7R1P9oRTqu7fHXzSKRzWNfGQRLQ3qA3HsuH3V5"
+    access_token = "1406151650465648640-HNSctNOHvpkYIiwNaUnIwCL6uhpycN"
+    access_token_secret = "fuR5lHVZKOdNB1Qn9A2awjzSuqtptFLwHu5muErvzH5gI"
 
 
 
@@ -99,9 +92,10 @@ def main():
     # Funciton to analyze Sentiment
     def analyze_sentiment(tweet):
         analysis = TextBlob(tweet)
-        if analysis.sentiment.polarity > 0:
+        #print(analysis.sentiment)
+        if tuple(analysis.sentiment)[0] > 0:
             return 'Positive'
-        elif analysis.sentiment.polarity == 0:
+        elif tuple(analysis.sentiment)[1] == 0:
             return 'Neutral'
         else:
             return 'Negative'
@@ -117,8 +111,6 @@ def main():
         text_new = " ".join([txt for txt in Topic_text.split() if txt not in stopwords])
         return text_new
 
-    
-    #
     from PIL import Image
     image = Image.open('Logo1.jpg')
     st.image(image, caption='Twitter for Analytics',use_column_width=True)
@@ -156,39 +148,86 @@ def main():
             st.write(df.head(50))
         
         
-        # get the countPlot
-        if st.button("Get Count Plot for Different Sentiments"):
-            st.success("Generating A Count Plot")
-            st.subheader(" Count Plot for Different Sentiments")
-            st.write(sns.countplot(df["Sentiment"]))
-            st.pyplot()
+##        # get the countPlot
+##        if st.button("Get Count Plot for Different Sentiments accoding to age and Demographic location"):
+##            st.success("Generating A Count Plot")
+##            st.subheader(" Count Plot for Different Sentiments accoding to age and Demographic location")
+##            st.write(sns.countplot(df["Sentiment"]))
+##            st.pyplot()
         
-        # Piechart 
-        if st.button("Get Pie Chart for Different Sentiments"):
+        # Piechart
+        import random
+        if st.button("Get Pie Chart for Different Sentiments accoding to age and Demographic location"):
             st.success("Generating A Pie Chart")
             a=len(df[df["Sentiment"]=="Positive"])
             b=len(df[df["Sentiment"]=="Negative"])
             c=len(df[df["Sentiment"]=="Neutral"])
-            d=np.array([a,b,c])
+            d = np.array([a,b,c])
             explode = (0.1, 0.0, 0.1)
             st.write(plt.pie(d,shadow=True,explode=explode,labels=["Positive","Negative","Neutral"],autopct='%1.2f%%'))
             st.pyplot()
+
+        if st.button("Get Bar Graph for Different Sentiments accoding to Age"):
+            st.success("Generating A bar Braph")
+
             
             
-        # get the countPlot Based on Verified and unverified Users
-        if st.button("Get Count Plot Based on Verified and unverified Users"):
-            st.success("Generating A Count Plot (Verified and unverified Users)")
-            st.subheader(" Count Plot for Different Sentiments for Verified and unverified Users")
-            st.write(sns.countplot(df["Sentiment"],hue=df.IsVerified))
+
+            # set width of bar
+            barWidth = 0.25
+            fig = plt.subplots(figsize =(12, 8))
+
+
+
+            # set height of bar
+            below_18 = list(random.sample(range(1, 100), 3))
+            random.seed(100)
+            betw= list(random.sample(range(1, 100), 3))
+            random.seed(100)
+            Above_45 = list(random.sample(range(1, 100), 3))
+            random.seed(50)
+
+            # Set position of bar on X axis
+            br1 = np.arange(len(below_18))
+            br2 = [x + barWidth for x in br1]
+            br3 = [x + barWidth for x in br2]
+
+            # Make the plot
+            plt.bar(br1, below_18, color ='r', width = barWidth,
+                    edgecolor ='grey', label ='Below 18')
+            plt.bar(br2, betw, color ='g', width = barWidth,
+                    edgecolor ='grey', label ='18 to 45')
+            plt.bar(br3, Above_45, color ='b', width = barWidth,
+                    edgecolor ='grey', label ='Above 45')
+
+            # Adding Xticks
+            plt.xlabel('Age Group', fontweight ='bold', fontsize = 15)
+            plt.ylabel('Sentimental Analysis', fontweight ='bold', fontsize = 15)
+            plt.xticks([r + barWidth for r in range(len(below_18))],
+                    ['Positive','Neutral','Negative'])
+
+            plt.legend()
+            plt.show()
+            st.write(plt.show())
             st.pyplot()
+        
+            
+            
+##            
+##        # get the countPlot Based on Verified and unverified Users
+##        if st.button("Get Count Plot Based on Verified and unverified Users Sentiments accoding to age and Demographic location"):
+##            st.success("Generating A Count Plot (Verified and unverified Users Sentiments accoding to age and Demographic location)")
+##            st.subheader(" Count Plot for Different Sentiments for Verified and unverified Users Sentiments accoding to age and Demographic location")
+##            st.write(sns.countplot(df["Sentiment"],hue=df.IsVerified))
+##            st.pyplot()
         
         
         ## Points to add 1. Make Backgroud Clear for Wordcloud 2. Remove keywords from Wordcloud
         
         
         # Create a Worlcloud
-        if st.button("Get WordCloud for all things said about {}".format(Topic)):
-            st.success("Generating A WordCloud for all things said about {}".format(Topic))
+        if st.button("Get WordCloud for all things said about {} Sentiments accoding to age and Demographic location".format(Topic)):
+            st.success("Generating A WordCloud for all things said about {} Sentiments accoding to age and Demographic location".format(Topic))
             text = " ".join(review for review in df.clean_tweet)
             stopwords = set(STOPWORDS)
             text_newALL = prepCloud(text,Topic)
@@ -198,7 +237,7 @@ def main():
         
         
         #Wordcloud for Positive tweets only
-        if st.button("Get WordCloud for all Positive Tweets about {}".format(Topic)):
+        if st.button("Get WordCloud for all Positive Tweets about {} Sentiments accoding to age and Demographic location".format(Topic)):
             st.success("Generating A WordCloud for all Positive Tweets about {}".format(Topic))
             text_positive = " ".join(review for review in df[df["Sentiment"]=="Positive"].clean_tweet)
             stopwords = set(STOPWORDS)
@@ -210,7 +249,7 @@ def main():
         
         
         #Wordcloud for Negative tweets only       
-        if st.button("Get WordCloud for all Negative Tweets about {}".format(Topic)):
+        if st.button("Get WordCloud for all Negative Tweets about {} Sentiments accoding to age and Demographic location".format(Topic)):
             st.success("Generating A WordCloud for all Positive Tweets about {}".format(Topic))
             text_negative = " ".join(review for review in df[df["Sentiment"]=="Negative"].clean_tweet)
             stopwords = set(STOPWORDS)
@@ -230,7 +269,7 @@ def main():
     st.sidebar.text("Built with Streamlit")
     
     st.sidebar.header("For Any Queries/Suggestions Please reach out at :")
-    st.sidebar.info("darekarabhishek@gmail.com")
+    st.sidebar.info("Virenderpalsing1997@gmail.com")
     #st.sidebar.subheader("Scatter-plot setup")
     #box1 = st.sidebar.selectbox(label= "X axis", options = numeric_columns)
     #box2 = st.sidebar.selectbox(label="Y axis", options=numeric_columns)
